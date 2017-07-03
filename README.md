@@ -1,7 +1,8 @@
 ## VGGFace-nnabla
 
 ### About
-This repository is implementation of VGG-Face CNN with Sony's Neural Network Libraries, [NNabla](https://github.com/sony/nnabla).
+This repository is implementation of VGG-Face CNN with Sony's Neural Network Libraries, [NNabla](https://github.com/sony/nnabl\
+a).
 
 ### Requirement
 - Python2
@@ -9,6 +10,9 @@ This repository is implementation of VGG-Face CNN with Sony's Neural Network Lib
 - OpenCV 2.4.11
 
 ### Usage
+```
+wget https://github.com/hogefugabar/VGGFace-nnabla/releases/download/v0.0.1-alpha/vggface_weights.pkl
+```
 Coming soon...
 
 ### Reference
