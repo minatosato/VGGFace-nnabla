@@ -13,7 +13,52 @@ This repository is implementation of VGG-Face CNN with Sony's Neural Network Lib
 $ wget https://github.com/opencv/opencv/blob/master/data/haarcascades/haarcascade_frontalface_alt.xml
 $ wget https://github.com/hogefugabar/VGGFace-nnabla/releases/download/v0.0.1-alpha/vggface_weights.pkl
 ```
-Coming soon...
+
+### Finetuning
+```py
+import nnabla as nn
+import nnabla.functions as F
+import nnabla.parametric_functions as PF
+import nnabla.solvers as S
+
+from vggface import VGGFace
+
+n_hidden = 4096
+n_classes = 10
+
+model = VGGFace(include_top=False)
+x = model.x
+t = model.t
+h = model.output
+h = F.relu(PF.affine(h, n_hidden, name='fc1'))
+h = F.relu(PF.affine(h, n_hidden, name='fc2'))
+y = PF.affine(h, n_classes)
+loss = F.mean(F.softmax_cross_entropy(self.y, self.t))
+
+"""insert your training loop"""
+```
+
+### Prediction
+```py
+import nnabla as nn
+import nnabla.functions as F
+import nnabla.parametric_functions as PF
+import nnabla.solvers as S
+
+from vggface import VGGFace
+
+import cv2
+image = cv2.imread("./image.jpg")
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+image = cv2.resize(image, (224, 224))[np.newaxis].transpose(0, 3, 1, 2)/255.
+
+
+model = VGGFace(batch_size=1)
+model.x.d = image
+model.output.forward()
+output = model.output.d.copy()
+print(output[0].argmax())
+```
 
 ### Reference
 - [VGG-Face CNN descriptor](http://www.robots.ox.ac.uk/~vgg/software/vgg_face/)
