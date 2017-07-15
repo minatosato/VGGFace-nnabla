@@ -17,18 +17,21 @@ $ wget https://github.com/hogefugabar/VGGFace-nnabla/releases/download/v0.0.1-al
 ### Feature extraction
 ```py
 from vggface import VGGFace
+import nnabla as nn
 import numpy as np
+improt cv2
 
 batch_size = 50
 
 """convolution feature"""
-model = VGGFace([batch_size, 3, 224, 224], include_top=False)
-x = model.x
+x = nn.Variable([batch_size, 3, 224, 224])
+model = VGGFace(x, include_top=False, pooling='avg')
 feature = model.output
 """"""
 
 """first FC layer feature"""
-model = VGGFace([batch_size, 3, 224, 224], include_top=True)
+x = nn.Variable([batch_size, 3, 224, 224])
+model = VGGFace(x, include_top=True)
 x = model.x
 feature = model.layers['fc1']
 """"""
@@ -56,9 +59,9 @@ n_hidden = 4096
 n_classes = 10
 batch_size = 50
 
-model = VGGFace([batch_size, 3, 224, 224], include_top=False)
-x = model.x
-t = model.t
+x = nn.Variable([batch_size, 3, 224, 224])
+t = nn.Variable([batch_size, 1])
+model = VGGFace(x, include_top=False)
 h = model.output
 h = F.relu(PF.affine(h, n_hidden, name='fc1'))
 h = F.relu(PF.affine(h, n_hidden, name='fc2'))
@@ -78,12 +81,12 @@ image = cv2.imread("./image.jpg")
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 image = cv2.resize(image, (224, 224))[np.newaxis].transpose(0, 3, 1, 2)/255.
 
-
-model = VGGFace([1, 3, 244, 244])
-model.x.d = image
-model.output.forward()
-output = model.output.d.copy()
-print(output[0].argmax())
+x = nn.Variable([1, 3, 244, 244])
+model = VGGFace(x)
+y = model.output
+x.d = image
+y.forward()
+print(y.d[0].argmax())
 ```
 
 ### Reference

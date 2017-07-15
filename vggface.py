@@ -20,10 +20,9 @@ nn.set_default_context(ctx)
 """"""
 
 class VGGFace(object):
-    def __init__(self, input_shape, include_top=True, load_weights=True):
-        self.batch_size = input_shape[0]
-        self.x = nn.Variable(input_shape)
-        self.t = nn.Variable([self.batch_size, 1])
+    def __init__(self, input_tensor, include_top=True, load_weights=True, pooling=None):
+        self.x = input_tensor
+        self.batch_size = input_tensor.shape[0]
         self.layers = OrderedDict()
         h = self.layers['conv1'] = F.relu(PF.convolution(self.x, 64, (3, 3), pad=(1, 1), stride=(1, 1), name='conv1'))
         h = self.layers['conv2'] = F.relu(PF.convolution(h, 64,  (3, 3), pad=(1, 1), stride=(1, 1), name='conv2'))
@@ -56,13 +55,18 @@ class VGGFace(object):
             h = self.layers['relu2'] = F.relu(h)
             h = self.layers['fc3'] = PF.affine(h, 2622, name='fc3')
             # self.loss = F.mean(F.softmax_cross_entropy(self.y, self.t))
+        else:
+            if pooling == 'avg':
+                h = self.layers['gpool1'] = self._global_average_pooling(h)
+            elif pooling == 'max':
+                h = self.layers['gpool1'] = self._global_max_pooling(h)
 
         self.output = h
 
         if load_weights:
-            self.set_pretrained_weights(include_top)
+            self._set_pretrained_weights(include_top)
 
-    def set_pretrained_weights(self, include_top):
+    def _set_pretrained_weights(self, include_top):
         print("load pre-trained model...")
         weights = pickle.load(open("./vggface_weights.pkl", "rb"))
         params = nn.get_parameters()
@@ -70,7 +74,24 @@ class VGGFace(object):
             if "fc" in name and include_top==False:
                 break
             # print(name)
+            # print(params[name].d.shape)
+            # print(weights[name].shape)
             assert params[name].d.shape == weights[name].shape
             params[name].d = weights[name].copy()
         print("done!")
+
+    def _global_average_pooling(self, x):
+        return F.mean(F.mean(x, axis=2), axis=2)
+
+    def _global_max_pooling(self, x):
+        return F.max(F.max(x, axis=2), axis=2)
+    
+    def summarize_layers(self):
+        name_len = max(map(len, self.layers.keys()))
+        print("".rjust(name_len+8) + "output shape")
+        print("input".rjust(name_len) + " layer: " + str(self.x.shape))
+        for key in self.layers:
+            print(key.rjust(name_len) + " layer: " + str(self.layers[key].shape))
+
+
 
