@@ -71,7 +71,8 @@ def get_face(cascade_classifier, file_path):
     # plt.show()
     return dst_image
 
-vggface = VGGFace([50, 3, 224, 224], include_top=True, load_weights=True)
+x = nn.Variable([50, 3, 224, 224])
+vggface = VGGFace(x, include_top=True, load_weights=True)
 
 # cascade_classifier = cv2.CascadeClassifier("./haarcascade_frontalface_alt.xml")
 cascade_classifier = cv2.CascadeClassifier("./haarcascade_frontalface_alt2.xml")
