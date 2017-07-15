@@ -32,7 +32,6 @@ feature = model.output
 """first FC layer feature"""
 x = nn.Variable([batch_size, 3, 224, 224])
 model = VGGFace(x, include_top=True)
-x = model.x
 feature = model.layers['fc1']
 """"""
 
