@@ -15,7 +15,7 @@ import nnabla.solvers as S
 
 """cuda setting"""
 from nnabla.contrib.context import extension_context
-ctx = extension_context("cuda.cudnn", device_id=0)
+ctx = extension_context("cuda.cudnn", device_id=1)
 nn.set_default_context(ctx)
 """"""
 
